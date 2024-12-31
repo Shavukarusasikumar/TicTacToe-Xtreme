@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class PlayerIcon extends StatelessWidget {
   final bool isAI;
 
-  const PlayerIcon({Key? key, required this.isAI}) : super(key: key);
+  const PlayerIcon({super.key, required this.isAI});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class PlayerIcon extends StatelessWidget {
       decoration: BoxDecoration(
         color: isAI ? Colors.pinkAccent : Colors.amber,
         shape: BoxShape.circle,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 10,

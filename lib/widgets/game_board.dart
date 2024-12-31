@@ -8,11 +8,10 @@ import 'game_cell.dart';
 class GameBoard extends StatelessWidget {
   final bool isAIGame;
 
-  const GameBoard({Key? key, required this.isAIGame}) : super(key: key);
+  const GameBoard({super.key, required this.isAIGame});
 
   @override
   Widget build(BuildContext context) {
-    // Use the appropriate provider based on game mode
     final board = isAIGame
         ? Provider.of<GameProvider>(context).gameState.board
         : Provider.of<GameWithFriendProvider>(context).gameState.board;
@@ -23,7 +22,7 @@ class GameBoard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 10,
@@ -33,7 +32,7 @@ class GameBoard extends StatelessWidget {
       ),
       child: GridView.builder(
         shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
         ),
         itemCount: 9,

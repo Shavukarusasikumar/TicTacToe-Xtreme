@@ -15,12 +15,14 @@ void main() {
         ChangeNotifierProvider(create: (_) => StatsProvider()),
         ChangeNotifierProvider(create: (_) => GameWithFriendProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'TicTacToe Xtreme',
           theme: themeProvider.getTheme(),
-          home: HomeScreen(),
+          home: const HomeScreen(),
         );
       },
     );

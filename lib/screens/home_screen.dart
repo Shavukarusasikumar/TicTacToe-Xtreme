@@ -1,4 +1,3 @@
-// screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -25,13 +24,13 @@ class HomeScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: themeProvider.isDarkMode
                 ? [Colors.grey[900]!, Colors.grey[800]!]
-                : [Color(0xFFFFF3E2), Color(0xFFFFF3E2)],
+                : [const Color(0xFFFFF3E2), const Color(0xFFFFF3E2)],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -44,16 +43,16 @@ class HomeScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
+                          color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
                         ),
                       ).animate().fade().scale(),
                     
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   // Stats Cards Row
-                  Container(
+                  SizedBox(
                     height: 100,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
@@ -82,7 +81,7 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
                   // Game Mode Cards
                   _buildGameModeCard(
@@ -95,12 +94,12 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GameScreen(isAIGame: true),
+                          builder: (context) => const GameScreen(isAIGame: true),
                         ),
                       );
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildGameModeCard(
                     context,
                     'Play with Friend',
@@ -110,12 +109,12 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GameScreen(isAIGame: false),
+                          builder: (context) => const GameScreen(isAIGame: false),
                         ),
                       );
                     },
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
                   
                   Card(
@@ -125,55 +124,55 @@ class HomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Quick Settings',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           _buildQuickSettingTile(
                             'Theme',
                             themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
 
                             Switch(
-                              activeColor: Color(0xFFFBAB57),
-                              inactiveThumbColor: Color(0xFFFBAB57),
-                              inactiveTrackColor: Color(0xFFFBAB57).withOpacity(0.2),
+                              activeColor: const Color(0xFFFBAB57),
+                              inactiveThumbColor: const Color(0xFFFBAB57),
+                              inactiveTrackColor: const Color(0xFFFBAB57).withOpacity(0.2),
                               
                               value: themeProvider.isDarkMode,
                               onChanged: (_) => themeProvider.toggleTheme(),
                             ),
-                            themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
+                            themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
                           ),
                           _buildQuickSettingTile(
                             'Sound',
                             Icons.volume_up,
                             Switch(
-                              activeColor: Color(0xFFFBAB57),
-                              inactiveThumbColor: Color(0xFFFBAB57),
-                              inactiveTrackColor: Color(0xFFFBAB57).withOpacity(0.2),
+                              activeColor: const Color(0xFFFBAB57),
+                              inactiveThumbColor: const Color(0xFFFBAB57),
+                              inactiveTrackColor: const Color(0xFFFBAB57).withOpacity(0.2),
                               value: gameProvider.isSoundEnabled,
                               onChanged: (_) => gameProvider.toggleSound(),
                             ),
-                            themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
+                            themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
                           ),
                           _buildQuickSettingTile(
                             'Music',
                             Icons.music_note,
                             Switch(
-                              activeColor: Color(0xFFFBAB57),
-                              inactiveThumbColor: Color(0xFFFBAB57),
-                              inactiveTrackColor: Color(0xFFFBAB57).withOpacity(0.2),
+                              activeColor: const Color(0xFFFBAB57),
+                              inactiveThumbColor: const Color(0xFFFBAB57),
+                              inactiveTrackColor: const Color(0xFFFBAB57).withOpacity(0.2),
                               value: gameProvider.isBackgroundMusicPlaying,
                               onChanged: (_) => gameProvider.toggleBackgroundMusic(),
                             ),
-                            themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
+                            themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
                           ),
                         ],
                       ),
@@ -190,7 +189,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildStatCard(String title, String value, Color color, IconData icon, BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    return Container(
+    return SizedBox(
      width: 110,
      
       child: Card(
@@ -201,7 +200,7 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 20),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               value,
               style: TextStyle(
@@ -241,29 +240,29 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),color: themeProvider.isDarkMode ? Colors.grey[850] : Colors.white,
           ),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFFFBAB57).withOpacity(0.2),
+                  color: const Color(0xFFFBAB57).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
                   size: 30,
-                  color: Color(0xFFFBAB57),
+                  color: const Color(0xFFFBAB57),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
@@ -277,12 +276,12 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right),
+              const Icon(Icons.chevron_right),
             ],
           ),
         ),
       ),
-    ).animate().fade(delay: Duration(milliseconds: 200)).scale();
+    ).animate().fade(delay: const Duration(milliseconds: 200)).scale();
   }
 
   Widget _buildQuickSettingTile(String title, IconData icon, Widget trailing,Color color) {

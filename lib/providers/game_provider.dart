@@ -56,7 +56,7 @@ final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
       }
       
       if (_gameState.status == GameStatus.playing) {
-        Future.delayed(Duration(milliseconds: 500), () {
+        Future.delayed(const Duration(milliseconds: 500), () {
           _makeAIMove();
         });
       } else {

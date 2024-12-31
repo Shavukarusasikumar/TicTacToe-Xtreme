@@ -4,6 +4,8 @@ import 'package:tic_tac_toe_remaster/providers/stats_provider.dart';
 import 'package:tic_tac_toe_remaster/providers/theme_provider.dart';
 
 class StatsCard extends StatelessWidget {
+  const StatsCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     final stats = Provider.of<StatsProvider>(context).stats;
@@ -13,7 +15,7 @@ class StatsCard extends StatelessWidget {
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: themeProvider.isDarkMode
@@ -32,7 +34,7 @@ class StatsCard extends StatelessWidget {
                 color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildStatRow('Wins', stats.wins.toString(), Colors.green),
             _buildStatRow('Losses', stats.losses.toString(), Colors.red),
             _buildStatRow('Draws', stats.draws.toString(), Colors.orange),
@@ -49,13 +51,13 @@ class StatsCard extends StatelessWidget {
 
   Widget _buildStatRow(String label, String value, Color color) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 18)),
+          Text(label, style: const TextStyle(fontSize: 18)),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),

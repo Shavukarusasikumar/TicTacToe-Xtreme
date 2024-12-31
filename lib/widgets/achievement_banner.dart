@@ -5,7 +5,7 @@ class AchievementBanner extends StatelessWidget {
   final String title;
   final String description;
 
-  const AchievementBanner({
+  const AchievementBanner({super.key, 
     required this.title,
     required this.description,
   });
@@ -13,14 +13,14 @@ class AchievementBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.amber[300]!, Colors.amber[500]!],
         ),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             offset: Offset(0, 4),
@@ -30,15 +30,15 @@ class AchievementBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.emoji_events, size: 40, color: Colors.white),
-          SizedBox(width: 16),
+          const Icon(Icons.emoji_events, size: 40, color: Colors.white),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -46,7 +46,7 @@ class AchievementBanner extends StatelessWidget {
                 ),
                 Text(
                   description,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
                   ),
@@ -57,9 +57,9 @@ class AchievementBanner extends StatelessWidget {
         ],
       ),
     ).animate()
-      .fade(duration: Duration(milliseconds: 500))
-      .scale(delay: Duration(milliseconds: 300))
-      .then(delay: Duration(milliseconds: 800))
+      .fade(duration: const Duration(milliseconds: 500))
+      .scale(delay: const Duration(milliseconds: 300))
+      .then(delay: const Duration(milliseconds: 800))
       .shake();
   }
 }

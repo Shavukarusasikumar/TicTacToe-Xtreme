@@ -8,11 +8,11 @@ class GameCell extends StatelessWidget {
   final bool isNewMove;
 
   const GameCell({
-    Key? key,
+    super.key,
     required this.cellState,
     required this.onTap,
     required this.isNewMove,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class GameCell extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: Colors.white),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [Colors.white10, Colors.white24],
@@ -38,13 +38,13 @@ class GameCell extends StatelessWidget {
     Widget content;
     switch (cellState) {
       case CellState.x:
-        content = Icon(Icons.close, size: 60, color: Color(0xFFFBAB57));
+        content = const Icon(Icons.close, size: 60, color: Color(0xFFFBAB57));
         break;
       case CellState.o:
-        content = Icon(Icons.radio_button_unchecked, size: 60, color: Colors.pinkAccent);
+        content = const Icon(Icons.radio_button_unchecked, size: 60, color: Colors.pinkAccent);
         break;
       case CellState.empty:
-        content = SizedBox.shrink();
+        content = const SizedBox.shrink();
         break;
     }
     

@@ -12,7 +12,7 @@ import '../utils/quotes.dart';
 class GameScreen extends StatelessWidget {
   final bool isAIGame;
 
-  GameScreen({required this.isAIGame});
+  const GameScreen({super.key, required this.isAIGame});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class GameScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: themeProvider.isDarkMode
                 ? [Colors.grey[900]!, Colors.grey[800]!]
-                : [Color.fromARGB(111, 255, 243, 226), Color.fromARGB(179, 255, 243, 226)],
+                : [const Color.fromARGB(111, 255, 243, 226), const Color.fromARGB(179, 255, 243, 226)],
           ),
         ),
         child: SafeArea(
@@ -43,9 +43,9 @@ class GameScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
-                    shadows: [
-                      Shadow(offset: Offset(2, 2), blurRadius: 3, color: Colors.black38),
+                    color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
+                    shadows: const [
+                       Shadow(offset: Offset(2, 2), blurRadius: 3, color: Colors.black38),
                     ],
                   ),
                 ),
@@ -58,8 +58,8 @@ class GameScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? Colors.white : Color(0xFFFBAB57),
-                    shadows: [
+                    color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
+                    shadows: const [
                       Shadow(offset: Offset(1, 1), blurRadius: 2, color: Colors.black38),
                     ],
                   ),
@@ -68,7 +68,7 @@ class GameScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  PlayerIcon(isAI: false),
+                  const PlayerIcon(isAI: false),
                   ElevatedButton(
                     onPressed: () {
                       if (isAIGame) {
@@ -77,20 +77,20 @@ class GameScreen extends StatelessWidget {
                         Provider.of<GameWithFriendProvider>(context, listen: false).resetGame();
                       }
                     },
-                    child: Text('Restart', style: TextStyle(fontSize: 18)),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.amber,
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
+                    child: const Text('Restart', style: TextStyle(fontSize: 18)),
                   ),
                   PlayerIcon(isAI: isAIGame),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

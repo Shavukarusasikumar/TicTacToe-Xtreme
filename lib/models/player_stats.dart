@@ -15,9 +15,10 @@ class PlayerStats {
 
   void updateStats({bool isWin = false, bool isDraw = false}) {
     totalGames++;
-    if (isWin) wins++;
-    else if (isDraw) draws++;
-    else losses++;
+    if (isWin) {
+      wins++;
+    } else if (isDraw) {draws++;}
+    else {losses++;}
     winRate = (wins / totalGames) * 100;
   }
 

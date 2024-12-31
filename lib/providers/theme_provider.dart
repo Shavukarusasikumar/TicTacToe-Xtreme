@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeProvider with ChangeNotifier {
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
-  final Color customPrimaryColor = Color(0xFFFBAB57);
+  final Color customPrimaryColor = const Color(0xFFFBAB57);
 
   ThemeProvider() {
     _loadThemePreference();

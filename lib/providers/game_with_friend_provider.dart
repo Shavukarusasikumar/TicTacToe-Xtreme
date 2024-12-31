@@ -22,7 +22,7 @@ class GameWithFriendProvider extends ChangeNotifier {
       if (currentPlayer == CellState.x) {
         _gameState.playerMoves.add([row, col]);
       } else {
-        _gameState.aiMoves.add([row, col]); // Renaming this might be better (e.g., `opponentMoves`)
+        _gameState.aiMoves.add([row, col]); 
       }
       _newMove = [row, col];
       _playSound('move');
