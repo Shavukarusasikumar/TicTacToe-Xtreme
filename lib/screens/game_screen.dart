@@ -17,9 +17,9 @@ class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final gameStatus = isAIGame
-        ? Provider.of<GameProvider>(context).gameState.status
-        : Provider.of<GameWithFriendProvider>(context).gameState.status;
+    final gameStatus = isAIGame ? Provider.of<GameProvider>(context).gameState.status : Provider.of<GameWithFriendProvider>(context).gameState.status;
+
+    final gameMode = isAIGame ? Provider.of<GameProvider>(context).gameMode : Provider.of<GameWithFriendProvider>(context).gameMode;
 
     return Scaffold(
       body: Container(
@@ -38,23 +38,49 @@ class GameScreen extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  isAIGame ? 'AI Tic Tac Toe' : 'Friend Tic Tac Toe',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
-                    shadows: const [
-                       Shadow(offset: Offset(2, 2), blurRadius: 3, color: Colors.black38),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      isAIGame ? 'AI Tic Tac Toe' : 'Friend Tic Tac Toe',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
+                        shadows: const [
+                          Shadow(offset: Offset(2, 2), blurRadius: 3, color: Colors.black38),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: themeProvider.isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: gameMode == GameMode.xtreme ? Colors.orange : Colors.green,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Text(
+                          gameMode == GameMode.xtreme ? 'XTREME MODE' : 'NORMAL MODE',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: gameMode == GameMode.xtreme ? Colors.orange : Colors.green,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               GameBoard(isAIGame: isAIGame),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  _getStatusText(gameStatus),
+                  _getStatusText(gameStatus, isAIGame, gameMode),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -68,14 +94,27 @@ class GameScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const PlayerIcon(isAI: false),
+                  PlayerIcon(
+                    isAI: false,
+                    isCurrentTurn: isAIGame
+                        ? Provider.of<GameProvider>(context).gameState.isPlayerTurn
+                        : Provider.of<GameWithFriendProvider>(context).gameState.isPlayerTurn,
+                    label: isAIGame ? 'You' : 'Player 1',
+                  ),
                   ElevatedButton(
-                    onPressed: () {
+                     onPressed: () {
                       if (isAIGame) {
                         Provider.of<GameProvider>(context, listen: false).resetGame();
                       } else {
                         Provider.of<GameWithFriendProvider>(context, listen: false).resetGame();
                       }
+                   
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameScreen(isAIGame: isAIGame),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -87,7 +126,14 @@ class GameScreen extends StatelessWidget {
                     ),
                     child: const Text('Restart', style: TextStyle(fontSize: 18)),
                   ),
-                  PlayerIcon(isAI: isAIGame),
+                  PlayerIcon(
+                 
+                    isAI: true,
+                    isCurrentTurn: isAIGame
+                        ? !Provider.of<GameProvider>(context).gameState.isPlayerTurn
+                        : !Provider.of<GameWithFriendProvider>(context).gameState.isPlayerTurn,
+                    label: isAIGame ? 'AI' : 'Player 2',
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -98,9 +144,12 @@ class GameScreen extends StatelessWidget {
     );
   }
 
-  String _getStatusText(GameStatus status) {
+  String _getStatusText(GameStatus status, bool isAIGame, GameMode mode) {
     switch (status) {
       case GameStatus.playing:
+        if (mode == GameMode.xtreme) {
+          return isAIGame ? 'First moves disappear after 3!' : 'First move will disappear after 3!';
+        }
         return 'Game in progress';
       case GameStatus.playerWin:
         return isAIGame ? 'You win! 🎉' : 'Player 1 wins! 🎉';
@@ -109,5 +158,52 @@ class GameScreen extends StatelessWidget {
       default:
         return '';
     }
+  }
+}
+
+
+class PlayerIcon extends StatelessWidget {
+  final bool isAI;
+  final bool isCurrentTurn;
+  final String label;
+
+  const PlayerIcon({
+    super.key,
+    required this.isAI,
+    required this.isCurrentTurn,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isCurrentTurn
+            ? (themeProvider.isDarkMode 
+                ? Colors.grey[700] 
+                : Colors.amber.withOpacity(0.2))
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            isAI ? Icons.smart_toy : Icons.person,
+            size: 30,
+            color: isAI 
+                ? Colors.red 
+                : const Color(0xFFFBAB57),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

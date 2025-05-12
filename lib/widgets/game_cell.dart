@@ -6,55 +6,56 @@ class GameCell extends StatelessWidget {
   final CellState cellState;
   final VoidCallback onTap;
   final bool isNewMove;
+  final bool isDisabled;
 
   const GameCell({
     super.key,
     required this.cellState,
     required this.onTap,
     required this.isNewMove,
+    this.isDisabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap,
       child: Container(
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white10, Colors.white24],
-          ),
+          color: isDisabled ? Colors.grey.withOpacity(0.2) : (isNewMove ? Colors.amber.withOpacity(0.3) : Colors.white.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(10),
+          border: isNewMove ? Border.all(color: Colors.amber, width: 2) : null,
         ),
         child: Center(
-          child: _buildCellContent(),
+          child: _getCellContent(),
         ),
       ),
     );
   }
 
-  Widget _buildCellContent() {
-    Widget content;
+  Widget _getCellContent() {
     switch (cellState) {
       case CellState.x:
-        content = const Icon(Icons.close, size: 60, color: Color(0xFFFBAB57));
-        break;
+        return const Text(
+          'X',
+          style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+          ),
+        );
       case CellState.o:
-        content = const Icon(Icons.radio_button_unchecked, size: 60, color: Colors.pinkAccent);
-        break;
+        return const Text(
+          'O',
+          style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+          ),
+        );
       case CellState.empty:
-        content = const SizedBox.shrink();
-        break;
+        return const SizedBox.shrink();
     }
-    
-    if (isNewMove && cellState != CellState.empty) {
-      return content.animate()
-        .scale(duration: 300.ms)
-        .then(delay: 100.ms)
-        .shake(duration: 300.ms);
-    }
-    
-    return content;
   }
 }

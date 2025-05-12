@@ -4,9 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:tic_tac_toe_remaster/providers/stats_provider.dart';
 import '../models/game_state.dart';
 
+enum GameMode { normal, xtreme }
+
 class GameWithFriendProvider extends ChangeNotifier {
   GameState _gameState = GameState.initial();
   GameState get gameState => _gameState;
+  GameMode _gameMode = GameMode.normal;
+  GameMode get gameMode => _gameMode;
   
   List<int> _newMove = [-1, -1];
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -14,11 +18,21 @@ class GameWithFriendProvider extends ChangeNotifier {
 
   bool get isSoundEnabled => _isSoundEnabled;
 
-  void makeMove(int row, int col,BuildContext context) {
+  void setGameMode(GameMode mode) {
+    _gameMode = mode;
+    resetGame();
+    notifyListeners();
+  }
+
+  void makeMove(int row, int col, BuildContext context) {
+     if (_gameState.status != GameStatus.playing) {
+      return;
+    }
     if (_gameState.board[row][col] == CellState.empty &&
         _gameState.status == GameStatus.playing) {
       CellState currentPlayer = _gameState.isPlayerTurn ? CellState.x : CellState.o;
       _updateBoard(row, col, currentPlayer);
+      
       if (currentPlayer == CellState.x) {
         _gameState.playerMoves.add([row, col]);
       } else {
@@ -27,13 +41,18 @@ class GameWithFriendProvider extends ChangeNotifier {
       _newMove = [row, col];
       _playSound('move');
       
-      if (_gameState.playerMoves.length == 4 || _gameState.aiMoves.length == 4) {
-        _checkGameStatus(currentPlayer,context);
-        if (_gameState.status == GameStatus.playing) {
-          _removeFirstMove(currentPlayer);
+      if (_gameMode == GameMode.xtreme) {
+        if ((currentPlayer == CellState.x && _gameState.playerMoves.length == 4) || 
+            (currentPlayer == CellState.o && _gameState.aiMoves.length == 4)) {
+          _checkGameStatus(currentPlayer, context);
+          if (_gameState.status == GameStatus.playing) {
+            _removeFirstMove(currentPlayer);
+          }
+        } else {
+          _checkGameStatus(currentPlayer, context);
         }
       } else {
-        _checkGameStatus(currentPlayer,context);
+        _checkGameStatus(currentPlayer, context);
       }
 
       if (_gameState.status != GameStatus.playing) {
@@ -41,6 +60,8 @@ class GameWithFriendProvider extends ChangeNotifier {
       }
     }
   }
+
+
 
   void _updateBoard(int row, int col, CellState state) {
     final newBoard = List<List<CellState>>.from(_gameState.board);
@@ -67,19 +88,27 @@ class GameWithFriendProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _checkGameStatus(CellState lastMove, BuildContext context) {
-  if (_checkWinner(lastMove)) {
-    bool isPlayerWin = lastMove == CellState.x;
-    _gameState = _gameState.copyWith(
-      status: isPlayerWin ? GameStatus.playerWin : GameStatus.aiWin,
-    );
-    
-    // Update stats
-    Provider.of<StatsProvider>(context, listen: false)
-        .updateStats(isWin: isPlayerWin);
+void _checkGameStatus(CellState lastMove, BuildContext context) {
+    if (_checkWinner(lastMove)) {
+      bool isPlayerWin = lastMove == CellState.x;
+      _gameState = _gameState.copyWith(
+        status: isPlayerWin ? GameStatus.playerWin : GameStatus.aiWin,
+      );
+      Provider.of<StatsProvider>(context, listen: false).updateStats(isWin: isPlayerWin);
+    } else if (_isBoardFull(_gameState.board)) {
+      _gameState = _gameState.copyWith(status: GameStatus.draw);
+      Provider.of<StatsProvider>(context, listen: false).updateStats(isDraw: true);
+    }
+    notifyListeners();
   }
-  notifyListeners();
-}
+  bool _isBoardFull(List<List<CellState>> board) {
+    for (var row in board) {
+      if (row.contains(CellState.empty)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   bool _checkWinner(CellState player) {
     for (int i = 0; i < 3; i++) {

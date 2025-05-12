@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tic_tac_toe_remaster/widgets/game_mode_selection.dart';
 import '../providers/game_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/stats_provider.dart';
@@ -41,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                       Text(
                         'TicTacToe Xtreme',
                         style: TextStyle(
-                          fontSize: 48,
+                          fontSize: 24,
                           fontWeight: FontWeight.w500,
                           color: themeProvider.isDarkMode ? Colors.white : const Color(0xFFFBAB57),
                         ),
@@ -83,34 +84,28 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
 
-                  // Game Mode Cards
-                  _buildGameModeCard(
+                 _buildGameModeCard(
                     context,
                     'Play vs AI',
                     'Challenge our unbeatable AI!',
                     Icons.smart_toy,
                     () {
-                      gameProvider.resetGame();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const GameScreen(isAIGame: true),
-                        ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => const GameModeSelectionDialog(isAIGame: true),
                       );
                     },
                   ),
                   const SizedBox(height: 16),
-                  _buildGameModeCard(
+                    _buildGameModeCard(
                     context,
                     'Play with Friend',
                     'Challenge a friend locally',
                     Icons.people,
                     () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const GameScreen(isAIGame: false),
-                        ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => const GameModeSelectionDialog(isAIGame: false,),
                       );
                     },
                   ),

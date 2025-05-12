@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:tic_tac_toe_remaster/providers/game_with_friend_provider.dart';
 import '../models/game_state.dart';
 import '../utils/ai_logic.dart';
 
 class GameProvider extends ChangeNotifier {
+   GameState _gameState = GameState.initial();
+  GameState get gameState => _gameState;
+  GameMode _gameMode = GameMode.normal;
+  GameMode get gameMode => _gameMode;
+  void setGameMode(GameMode mode) {
+    _gameMode = mode;
+    resetGame();
+    notifyListeners();
+  }
  
 
 final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
@@ -24,10 +34,11 @@ final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
   }
 
 
-  GameState _gameState = GameState.initial();
-  GameState get gameState => _gameState;
+
   void resetGame() {
     _gameState = GameState.initial();
+    _newMove = [-1, -1];
+    _playSound('reset');
     notifyListeners();
   }
   List<int> _newMove = [-1, -1];
@@ -38,23 +49,25 @@ final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
 
 
   void makeMove(int row, int col) {
-    if (_gameState.board[row][col] == CellState.empty &&
-        _gameState.isPlayerTurn &&
-        _gameState.status == GameStatus.playing) {
+    if (_gameState.board[row][col] == CellState.empty && _gameState.isPlayerTurn && _gameState.status == GameStatus.playing) {
       _updateBoard(row, col, CellState.x);
       _gameState.playerMoves.add([row, col]);
       _newMove = [row, col];
       _playSound('move');
-      
-      if (_gameState.playerMoves.length == 4) {
-        _checkGameStatus(CellState.x);
-        if (_gameState.status == GameStatus.playing) {
-          _removeFirstMove(CellState.x);
+
+      if (_gameMode == GameMode.xtreme) {
+        if (_gameState.playerMoves.length == 4) {
+          _checkGameStatus(CellState.x);
+          if (_gameState.status == GameStatus.playing) {
+            _removeFirstMove(CellState.x);
+          }
+        } else {
+          _checkGameStatus(CellState.x);
         }
       } else {
         _checkGameStatus(CellState.x);
       }
-      
+
       if (_gameState.status == GameStatus.playing) {
         Future.delayed(const Duration(milliseconds: 500), () {
           _makeAIMove();
@@ -75,17 +88,21 @@ final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
     notifyListeners();
   }
 
-  void _makeAIMove() {
+ void _makeAIMove() {
     final aiMove = findBestMove(_gameState.board);
     _updateBoard(aiMove.row, aiMove.col, CellState.o);
     _gameState.aiMoves.add([aiMove.row, aiMove.col]);
     _newMove = [aiMove.row, aiMove.col];
     _playSound('move');
-    
-    if (_gameState.aiMoves.length == 4) {
-      _checkGameStatus(CellState.o);
-      if (_gameState.status == GameStatus.playing) {
-        _removeFirstMove(CellState.o);
+
+    if (_gameMode == GameMode.xtreme) {
+      if (_gameState.aiMoves.length == 4) {
+        _checkGameStatus(CellState.o);
+        if (_gameState.status == GameStatus.playing) {
+          _removeFirstMove(CellState.o);
+        }
+      } else {
+        _checkGameStatus(CellState.o);
       }
     } else {
       _checkGameStatus(CellState.o);
@@ -111,16 +128,25 @@ final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
     notifyListeners();
   }
 
-  void _checkGameStatus(CellState lastMove) {
+ void _checkGameStatus(CellState lastMove) {
     if (_checkWinner(lastMove)) {
       _gameState = _gameState.copyWith(
         status: lastMove == CellState.x ? GameStatus.playerWin : GameStatus.aiWin,
       );
-      
+    } else if (_isBoardFull(_gameState.board)) {
+      _gameState = _gameState.copyWith(status: GameStatus.draw);
     }
     notifyListeners();
   }
 
+  bool _isBoardFull(List<List<CellState>> board) {
+    for (var row in board) {
+      if (row.contains(CellState.empty)) {
+        return false;
+      }
+    }
+    return true;
+  }
   bool _checkWinner(CellState player) {
     // Check rows, columns, and diagonals
     for (int i = 0; i < 3; i++) {
