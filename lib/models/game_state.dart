@@ -1,5 +1,9 @@
 enum CellState { empty, x, o }
+
 enum GameStatus { playing, playerWin, aiWin, draw }
+
+// Updated GameMode enum to include Ultra Xtreme
+enum GameMode { normal, xtreme, ultraXtreme }
 
 class GameState {
   List<List<CellState>> board;
@@ -16,7 +20,7 @@ class GameState {
     required this.aiMoves,
   });
 
-GameState.initial()
+  GameState.initial()
       : board = List.generate(3, (_) => List.filled(3, CellState.empty)),
         isPlayerTurn = true,
         status = GameStatus.playing,

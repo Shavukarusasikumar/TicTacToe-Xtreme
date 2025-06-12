@@ -4,6 +4,7 @@ import 'package:tic_tac_toe_remaster/screens/game_screen.dart';
 import '../providers/game_provider.dart';
 import '../providers/game_with_friend_provider.dart';
 import '../providers/theme_provider.dart';
+import '../models/game_state.dart';
 
 class GameModeSelectionDialog extends StatelessWidget {
   final bool isAIGame;
@@ -92,13 +93,32 @@ class GameModeSelectionDialog extends StatelessWidget {
                   _buildGameModeOption(
                     context: context,
                     title: 'Xtreme Mode',
-                    subtitle: 'Limited moves - remove first move after 3',
+                    subtitle: 'Remove first move after 4 moves',
                     icon: Icons.bolt,
                     iconColor: Colors.white,
                     bgColor: isDarkMode ? Colors.deepPurple.withOpacity(0.3) : primaryColor.withOpacity(0.2),
                     borderColor: isDarkMode ? Colors.deepPurple : primaryColor,
                     onTap: () {
                       _setGameMode(context, GameMode.xtreme);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameScreen(isAIGame: isAIGame),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildGameModeOption(
+                    context: context,
+                    title: 'Ultra Xtreme Mode',
+                    subtitle: 'Remove random move after 4 moves - chaos mode!',
+                    icon: Icons.flash_on,
+                    iconColor: Colors.white,
+                    bgColor: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.withOpacity(0.2),
+                    borderColor: isDarkMode ? Colors.redAccent : Colors.red,
+                    onTap: () {
+                      _setGameMode(context, GameMode.ultraXtreme);
                       Navigator.push(
                         context,
                         MaterialPageRoute(

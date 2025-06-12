@@ -1,160 +1,181 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:provider/provider.dart';
-import 'package:tic_tac_toe_remaster/providers/stats_provider.dart';
 import '../models/game_state.dart';
-
-enum GameMode { normal, xtreme }
 
 class GameWithFriendProvider extends ChangeNotifier {
   GameState _gameState = GameState.initial();
-  GameState get gameState => _gameState;
   GameMode _gameMode = GameMode.normal;
-  GameMode get gameMode => _gameMode;
-  
-  List<int> _newMove = [-1, -1];
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isSoundEnabled = true;
+  List<List<int>> _newMoves = [];
 
-  bool get isSoundEnabled => _isSoundEnabled;
+  GameState get gameState => _gameState;
+  GameMode get gameMode => _gameMode;
 
   void setGameMode(GameMode mode) {
     _gameMode = mode;
-    resetGame();
     notifyListeners();
+  }
+
+  bool isNewMove(int row, int col) {
+    return _newMoves.any((move) => move[0] == row && move[1] == col);
   }
 
   void makeMove(int row, int col, BuildContext context) {
-     if (_gameState.status != GameStatus.playing) {
+    if (_gameState.status != GameStatus.playing || _gameState.board[row][col] != CellState.empty) {
       return;
     }
-    if (_gameState.board[row][col] == CellState.empty &&
-        _gameState.status == GameStatus.playing) {
-      CellState currentPlayer = _gameState.isPlayerTurn ? CellState.x : CellState.o;
-      _updateBoard(row, col, currentPlayer);
-      
-      if (currentPlayer == CellState.x) {
-        _gameState.playerMoves.add([row, col]);
-      } else {
-        _gameState.aiMoves.add([row, col]); 
-      }
-      _newMove = [row, col];
-      _playSound('move');
-      
-      if (_gameMode == GameMode.xtreme) {
-        if ((currentPlayer == CellState.x && _gameState.playerMoves.length == 4) || 
-            (currentPlayer == CellState.o && _gameState.aiMoves.length == 4)) {
-          _checkGameStatus(currentPlayer, context);
-          if (_gameState.status == GameStatus.playing) {
-            _removeFirstMove(currentPlayer);
-          }
-        } else {
-          _checkGameStatus(currentPlayer, context);
-        }
-      } else {
-        _checkGameStatus(currentPlayer, context);
-      }
 
-      if (_gameState.status != GameStatus.playing) {
-        _playGameEndSound();
+    // Clear previous new moves
+    _newMoves.clear();
+
+    // Determine which player is making the move
+    final isPlayer1 = _gameState.isPlayerTurn;
+    final cellState = isPlayer1 ? CellState.x : CellState.o;
+
+    // Make the move
+    _gameState.board[row][col] = cellState;
+    _newMoves.add([row, col]);
+
+    // Add to appropriate moves list
+    if (isPlayer1) {
+      _gameState.playerMoves.add([row, col]);
+    } else {
+      _gameState.aiMoves.add([row, col]);
+    }
+
+    // Check for win
+    _checkGameStatus();
+    if (_gameState.status != GameStatus.playing) {
+      notifyListeners();
+      return;
+    }
+
+    // Handle special game modes
+    _handleGameModeLogic(isPlayer1Move: isPlayer1);
+
+    // Check again after potential move removal
+    _checkGameStatus();
+
+    // Switch turns
+    _gameState.isPlayerTurn = !_gameState.isPlayerTurn;
+    notifyListeners();
+  }
+
+  void _handleGameModeLogic({required bool isPlayer1Move}) {
+    switch (_gameMode) {
+      case GameMode.xtreme:
+        _handleXtremeMode(isPlayer1Move: isPlayer1Move);
+        break;
+      case GameMode.ultraXtreme:
+        _handleUltraXtremeMode(isPlayer1Move: isPlayer1Move);
+        break;
+      case GameMode.normal:
+        break;
+    }
+  }
+
+  void _handleXtremeMode({required bool isPlayer1Move}) {
+    if (isPlayer1Move && _gameState.playerMoves.length > 3) {
+      // Remove first player 1 move
+      final firstMove = _gameState.playerMoves.removeAt(0);
+      _gameState.board[firstMove[0]][firstMove[1]] = CellState.empty;
+    } else if (!isPlayer1Move && _gameState.aiMoves.length > 3) {
+      // Remove first player 2 move
+      final firstMove = _gameState.aiMoves.removeAt(0);
+      _gameState.board[firstMove[0]][firstMove[1]] = CellState.empty;
+    }
+  }
+
+  void _handleUltraXtremeMode({required bool isPlayer1Move}) {
+    if (isPlayer1Move && _gameState.playerMoves.length >= 4) {
+      // Remove a random player 1 move (not the most recent one)
+      final random = Random();
+      final availableMoves = _gameState.playerMoves.sublist(0, _gameState.playerMoves.length - 1);
+
+      if (availableMoves.isNotEmpty) {
+        final randomIndex = random.nextInt(availableMoves.length);
+        final moveToRemove = availableMoves[randomIndex];
+
+        // Remove from board
+        _gameState.board[moveToRemove[0]][moveToRemove[1]] = CellState.empty;
+
+        // Remove from moves list
+        _gameState.playerMoves.removeWhere((move) => move[0] == moveToRemove[0] && move[1] == moveToRemove[1]);
+      }
+    } else if (!isPlayer1Move && _gameState.aiMoves.length >= 4) {
+      // Remove a random player 2 move (not the most recent one)
+      final random = Random();
+      final availableMoves = _gameState.aiMoves.sublist(0, _gameState.aiMoves.length - 1);
+
+      if (availableMoves.isNotEmpty) {
+        final randomIndex = random.nextInt(availableMoves.length);
+        final moveToRemove = availableMoves[randomIndex];
+
+        // Remove from board
+        _gameState.board[moveToRemove[0]][moveToRemove[1]] = CellState.empty;
+
+        // Remove from moves list
+        _gameState.aiMoves.removeWhere((move) => move[0] == moveToRemove[0] && move[1] == moveToRemove[1]);
       }
     }
   }
 
-
-
-  void _updateBoard(int row, int col, CellState state) {
-    final newBoard = List<List<CellState>>.from(_gameState.board);
-    newBoard[row][col] = state;
-    _gameState = _gameState.copyWith(
-      board: newBoard,
-      isPlayerTurn: !_gameState.isPlayerTurn,
-    );
-    notifyListeners();
-  }
-
-  void _removeFirstMove(CellState player) {
-    List<List<int>> moves = player == CellState.x ? _gameState.playerMoves : _gameState.aiMoves;
-    List<int> firstMove = moves.removeAt(0);
-    
-    final newBoard = List<List<CellState>>.from(_gameState.board);
-    newBoard[firstMove[0]][firstMove[1]] = CellState.empty;
-    
-    _gameState = _gameState.copyWith(
-      board: newBoard,
-      playerMoves: player == CellState.x ? moves : _gameState.playerMoves,
-      aiMoves: player == CellState.o ? moves : _gameState.aiMoves,
-    );
-    notifyListeners();
-  }
-
-void _checkGameStatus(CellState lastMove, BuildContext context) {
-    if (_checkWinner(lastMove)) {
-      bool isPlayerWin = lastMove == CellState.x;
-      _gameState = _gameState.copyWith(
-        status: isPlayerWin ? GameStatus.playerWin : GameStatus.aiWin,
-      );
-      Provider.of<StatsProvider>(context, listen: false).updateStats(isWin: isPlayerWin);
-    } else if (_isBoardFull(_gameState.board)) {
-      _gameState = _gameState.copyWith(status: GameStatus.draw);
-      Provider.of<StatsProvider>(context, listen: false).updateStats(isDraw: true);
+  void _checkGameStatus() {
+    // Check for wins
+    if (_checkWin(CellState.x)) {
+      _gameState.status = GameStatus.playerWin;
+      return;
+    } else if (_checkWin(CellState.o)) {
+      _gameState.status = GameStatus.aiWin;
+      return;
     }
-    notifyListeners();
-  }
-  bool _isBoardFull(List<List<CellState>> board) {
-    for (var row in board) {
-      if (row.contains(CellState.empty)) {
-        return false;
-      }
-    }
-    return true;
-  }
 
-  bool _checkWinner(CellState player) {
+    // Check for draw
+    bool isDraw = true;
     for (int i = 0; i < 3; i++) {
-      if (_gameState.board[i][0] == player &&
-          _gameState.board[i][1] == player &&
-          _gameState.board[i][2] == player) return true;
-      if (_gameState.board[0][i] == player &&
-          _gameState.board[1][i] == player &&
-          _gameState.board[2][i] == player) return true;
+      for (int j = 0; j < 3; j++) {
+        if (_gameState.board[i][j] == CellState.empty) {
+          isDraw = false;
+          break;
+        }
+      }
+      if (!isDraw) break;
     }
-    if (_gameState.board[0][0] == player &&
-        _gameState.board[1][1] == player &&
-        _gameState.board[2][2] == player) return true;
-    if (_gameState.board[0][2] == player &&
-        _gameState.board[1][1] == player &&
-        _gameState.board[2][0] == player) return true;
+
+    if (isDraw) {
+      _gameState.status = GameStatus.draw;
+    }
+  }
+
+  bool _checkWin(CellState player) {
+    // Check rows
+    for (int i = 0; i < 3; i++) {
+      if (_gameState.board[i][0] == player && _gameState.board[i][1] == player && _gameState.board[i][2] == player) {
+        return true;
+      }
+    }
+
+    // Check columns
+    for (int j = 0; j < 3; j++) {
+      if (_gameState.board[0][j] == player && _gameState.board[1][j] == player && _gameState.board[2][j] == player) {
+        return true;
+      }
+    }
+
+    // Check diagonals
+    if (_gameState.board[0][0] == player && _gameState.board[1][1] == player && _gameState.board[2][2] == player) {
+      return true;
+    }
+
+    if (_gameState.board[0][2] == player && _gameState.board[1][1] == player && _gameState.board[2][0] == player) {
+      return true;
+    }
+
     return false;
   }
 
   void resetGame() {
     _gameState = GameState.initial();
-    _newMove = [-1, -1];
-    _playSound('reset');
+    _newMoves.clear();
     notifyListeners();
-  }
-
-  void _playSound(String soundName) {
-    if (_isSoundEnabled) {
-      _audioPlayer.play(AssetSource('sounds/$soundName.mp3'));
-    }
-  }
-
-  void _playGameEndSound() {
-    if (_gameState.status == GameStatus.playerWin) {
-      _playSound('win');
-    } else if (_gameState.status == GameStatus.aiWin) { // This might be better renamed as `opponentWin`
-      _playSound('lose');
-    }
-  }
-
-  void toggleSound() {
-    _isSoundEnabled = !_isSoundEnabled;
-    notifyListeners();
-  }
-
-  bool isNewMove(int row, int col) {
-    return _newMove[0] == row && _newMove[1] == col;
   }
 }

@@ -59,16 +59,20 @@ class GameScreen extends StatelessWidget {
                           color: themeProvider.isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.white.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: gameMode == GameMode.xtreme ? Colors.orange : Colors.green,
+                             color: gameMode == GameMode.xtreme
+                                ? Colors.orange
+                                : gameMode == GameMode.ultraXtreme
+                                    ? Colors.red
+                                    : Colors.green,
                             width: 1.5,
                           ),
                         ),
                         child: Text(
-                          gameMode == GameMode.xtreme ? 'XTREME MODE' : 'NORMAL MODE',
+                          gameMode == GameMode.xtreme ? 'XTREME MODE' :gameMode == GameMode.ultraXtreme ? 'ULTRA XTREME MODE' : 'NORMAL MODE',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: gameMode == GameMode.xtreme ? Colors.orange : Colors.green,
+                            color: gameMode == GameMode.xtreme ? Colors.orange:gameMode == GameMode.ultraXtreme ? Colors.red : Colors.green,
                           ),
                         ),
                       ),
